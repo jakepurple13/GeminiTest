@@ -50,6 +50,8 @@ import com.google.ai.client.generativeai.type.content
 import com.programmersbox.geminitest.BuildConfig
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -162,20 +164,24 @@ class ImageViewModel(
         viewModelScope.launch {
             isLoading = true
             runCatching {
-                generativeModel.generateContent(
+                generativeModel.generateContentStream(
                     content {
                         image(getBitmap(contentResolver, imageUri!!)!!)
                         text("Describe this image")
                     }
-                ).text!!
+                )
             }
-                .onSuccess { description = it }
+                .onSuccess { response ->
+                    response
+                        .onEach { description += it.text.orEmpty() }
+                        .launchIn(this)
+                }
                 .onFailure { description = it.localizedMessage.orEmpty() }
             isLoading = false
         }
     }
 
-    fun getBitmap(contentResolver: ContentResolver, fileUri: Uri?): Bitmap? {
+    private fun getBitmap(contentResolver: ContentResolver, fileUri: Uri?): Bitmap? {
         return try {
             ImageDecoder.decodeBitmap(ImageDecoder.createSource(contentResolver, fileUri!!))
         } catch (e: Exception) {
