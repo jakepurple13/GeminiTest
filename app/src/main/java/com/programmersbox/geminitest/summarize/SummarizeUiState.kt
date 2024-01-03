@@ -1,4 +1,4 @@
-package com.programmersbox.geminitest.generate
+package com.programmersbox.geminitest.summarize
 
 /**
  * A sealed hierarchy describing the state of the text generation.

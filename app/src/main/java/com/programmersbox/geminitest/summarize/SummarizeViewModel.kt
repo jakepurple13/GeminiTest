@@ -1,4 +1,4 @@
-package com.programmersbox.geminitest.generate
+package com.programmersbox.geminitest.summarize
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
