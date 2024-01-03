@@ -1,10 +1,7 @@
 package com.programmersbox.geminitest.image
 
 import android.Manifest
-import android.content.ContentResolver
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.ImageDecoder
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -40,19 +37,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
-import com.google.ai.client.generativeai.GenerativeModel
-import com.google.ai.client.generativeai.type.content
 import com.programmersbox.geminitest.BuildConfig
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import java.io.File
 
 
@@ -145,47 +135,6 @@ fun ImageScreen(
             }
 
             Text(viewModel.description)
-        }
-    }
-}
-
-class ImageViewModel(
-    private val generativeModel: GenerativeModel = GenerativeModel(
-        modelName = "gemini-pro-vision",
-        apiKey = BuildConfig.apiKey
-    )
-) : ViewModel() {
-
-    var description by mutableStateOf("")
-    var imageUri by mutableStateOf<Uri?>(null)
-    var isLoading by mutableStateOf(false)
-
-    fun describeImage(contentResolver: ContentResolver) {
-        viewModelScope.launch {
-            isLoading = true
-            runCatching {
-                generativeModel.generateContentStream(
-                    content {
-                        image(getBitmap(contentResolver, imageUri!!)!!)
-                        text("Describe this image")
-                    }
-                )
-            }
-                .onSuccess { response ->
-                    response
-                        .onEach { description += it.text.orEmpty() }
-                        .launchIn(this)
-                }
-                .onFailure { description = it.localizedMessage.orEmpty() }
-            isLoading = false
-        }
-    }
-
-    private fun getBitmap(contentResolver: ContentResolver, fileUri: Uri?): Bitmap? {
-        return try {
-            ImageDecoder.decodeBitmap(ImageDecoder.createSource(contentResolver, fileUri!!))
-        } catch (e: Exception) {
-            null
         }
     }
 }
