@@ -23,6 +23,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.programmersbox.geminitest.chat.ChatScreen
 import com.programmersbox.geminitest.image.ImageScreen
+import com.programmersbox.geminitest.question.QuestionScreen
 import com.programmersbox.geminitest.summarize.Summarize
 import com.programmersbox.geminitest.ui.theme.GeminiTestTheme
 
@@ -46,11 +47,19 @@ class MainActivity : ComponentActivity() {
                     ) {
                         composable("home") {
                             HomeScreen(
+                                onQuestionClick = { navController.navigate("question") },
                                 onSummarizeClick = { navController.navigate("summarize") },
                                 onChatClick = { navController.navigate("chat") },
                                 onImageClick = { navController.navigate("image") }
                             )
                         }
+
+                        composable("question") {
+                            QuestionScreen(
+                                onBackClick = { navController.popBackStack() }
+                            )
+                        }
+
                         composable("summarize") {
                             Summarize(
                                 onBackClick = { navController.popBackStack() }
@@ -78,6 +87,7 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeScreen(
+    onQuestionClick: NavClick,
     onSummarizeClick: NavClick,
     onChatClick: NavClick,
     onImageClick: NavClick,
@@ -92,6 +102,7 @@ private fun HomeScreen(
                 .padding(padding)
                 .fillMaxSize()
         ) {
+            Button(onClick = onQuestionClick) { Text("Question") }
             Button(onClick = onSummarizeClick) { Text("Summarize") }
             Button(onClick = onChatClick) { Text("Chat") }
             Button(onClick = onImageClick) { Text("Image") }

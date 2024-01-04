@@ -38,19 +38,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.ai.client.generativeai.GenerativeModel
-import com.programmersbox.geminitest.BuildConfig
 import com.programmersbox.geminitest.R
 
 @Composable
-fun Summarize(onBackClick: () -> Unit) {
-    val viewModel = viewModel {
-        val generativeModel = GenerativeModel(
-            modelName = "gemini-pro",
-            apiKey = BuildConfig.apiKey
-        )
-        SummarizeViewModel(generativeModel)
-    }
+fun Summarize(
+    onBackClick: () -> Unit,
+    viewModel: SummarizeViewModel = viewModel()
+) {
     SummarizeRoute(viewModel, onBackClick = onBackClick)
 }
 

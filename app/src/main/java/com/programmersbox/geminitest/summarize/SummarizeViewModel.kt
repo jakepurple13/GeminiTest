@@ -3,6 +3,8 @@ package com.programmersbox.geminitest.summarize
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.ai.client.generativeai.GenerativeModel
+import com.programmersbox.geminitest.BuildConfig
+import com.programmersbox.geminitest.safetySettings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,7 +13,11 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class SummarizeViewModel(
-    private val generativeModel: GenerativeModel
+    private val generativeModel: GenerativeModel = GenerativeModel(
+        modelName = "gemini-pro",
+        apiKey = BuildConfig.apiKey,
+        safetySettings = safetySettings
+    )
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<SummarizeUiState> =
@@ -26,10 +32,6 @@ class SummarizeViewModel(
 
         viewModelScope.launch {
             try {
-                /*val response = generativeModel.generateContent(prompt)
-                response.text?.let { outputContent ->
-                    _uiState.value = SummarizeUiState.Success(outputContent)
-                }*/
                 generativeModel.generateContentStream(prompt)
                     .onEach { response ->
                         response.text?.let { outputContent ->

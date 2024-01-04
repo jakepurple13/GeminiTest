@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.content
 import com.programmersbox.geminitest.BuildConfig
+import com.programmersbox.geminitest.safetySettings
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
@@ -17,7 +18,8 @@ import kotlinx.coroutines.launch
 class ImageViewModel(
     private val generativeModel: GenerativeModel = GenerativeModel(
         modelName = "gemini-pro-vision",
-        apiKey = BuildConfig.apiKey
+        apiKey = BuildConfig.apiKey,
+        safetySettings = safetySettings
     )
 ) : ViewModel() {
 
