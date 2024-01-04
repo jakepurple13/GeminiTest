@@ -101,6 +101,7 @@ fun SummarizeScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
+                    .imePadding()
                     .background(BottomAppBarDefaults.containerColor)
             )
         },
