@@ -9,6 +9,9 @@ import androidx.lifecycle.viewModelScope
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.content
 import com.programmersbox.geminitest.BuildConfig
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class ChatViewModel(
@@ -31,21 +34,32 @@ class ChatViewModel(
         prompt = value
     }
 
-    fun send() {
+    var chatStream by mutableStateOf("")
+
+    fun send(input: String) {
         viewModelScope.launch {
             runCatching {
-                messageList.add(Message.User(prompt))
+                messageList.add(Message.User(input))
                 isLoading = true
-                val message = prompt
-                prompt = ""
-                chat.sendMessage(message).text!!
+                //val message = input
+                //prompt = ""
+                chat.sendMessageStream(input)
             }
-                .onSuccess { messageList.add(Message.Gemini(it)) }
+                .onSuccess {
+                    it
+                        .onEach { chatStream += it.text.orEmpty() }
+                        .onCompletion {
+                            messageList.add(Message.Gemini(chatStream))
+                            chatStream = ""
+                            isLoading = false
+                        }
+                        .launchIn(this)
+                }
                 .onFailure {
                     it.printStackTrace()
                     messageList.add(Message.Error(it.localizedMessage.orEmpty()))
+                    isLoading = false
                 }
-            isLoading = false
         }
     }
 

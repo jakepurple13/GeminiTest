@@ -2,6 +2,7 @@
 accompanistPermissions = "0.33.2-alpha"
 agp = "8.4.0-alpha02"
 camera = "1.4.0-alpha03"
+coilCompose = "2.5.0"
 kotlin = "1.9.0"
 coreKtx = "1.12.0"
 junit = "4.14-SNAPSHOT"
@@ -22,6 +23,7 @@ accompanist-permissions = { module = "com.google.accompanist:accompanist-permiss
 androidx-camera-extensions = { module = "androidx.camera:camera-extensions", version.ref = "camera" }
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "camera" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

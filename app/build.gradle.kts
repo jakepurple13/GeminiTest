@@ -80,4 +80,5 @@ dependencies {
     implementation(libs.landscapist.glide)
     implementation(libs.accompanist.permissions)
     implementation(libs.realm)
+    implementation(libs.coil.compose)
 }
