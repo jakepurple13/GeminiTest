@@ -16,6 +16,9 @@ class ChatViewModel(
         apiKey = BuildConfig.apiKey
     )
 ) : ViewModel() {
+
+    private val chat = generativeModel.startChat()
+
     val messageList = mutableStateListOf<Message>(
         Message.Gemini("Hello! I am Gemini!")
     )
@@ -34,10 +37,13 @@ class ChatViewModel(
                 isLoading = true
                 val message = prompt
                 prompt = ""
-                generativeModel.generateContent(message).text!!
+                chat.sendMessage(message).text!!
             }
                 .onSuccess { messageList.add(Message.Gemini(it)) }
-                .onFailure { messageList.add(Message.Error(it.localizedMessage.orEmpty())) }
+                .onFailure {
+                    it.printStackTrace()
+                    messageList.add(Message.Error(it.localizedMessage.orEmpty()))
+                }
             isLoading = false
         }
     }
