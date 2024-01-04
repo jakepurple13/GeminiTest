@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.googleAndroidLibrariesMapsplatformSecretsGradlePlugin)
+    alias(libs.plugins.realmPlugin)
 }
 
 android {
@@ -78,4 +79,5 @@ dependencies {
     implementation(libs.androidx.camera.extensions)
     implementation(libs.landscapist.glide)
     implementation(libs.accompanist.permissions)
+    implementation(libs.realm)
 }

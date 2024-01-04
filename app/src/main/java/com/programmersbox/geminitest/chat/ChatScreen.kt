@@ -19,15 +19,21 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.AddCircleOutline
+import androidx.compose.material.icons.filled.SaveAlt
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -36,6 +42,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,78 +67,120 @@ fun ChatScreen(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val lazyState = rememberLazyListState()
     LaunchedEffect(viewModel.messageList.lastIndex) {
-        lazyState.animateScrollToItem(viewModel.messageList.lastIndex)
+        if (viewModel.messageList.isNotEmpty())
+            lazyState.animateScrollToItem(viewModel.messageList.lastIndex)
     }
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Chat") },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
-                    }
-                },
-                scrollBehavior = scrollBehavior
-            )
-        },
-        bottomBar = {
-            OutlinedTextField(
-                value = viewModel.prompt,
-                label = { Text("Chat with Gemini") },
-                placeholder = { Text("Enter Text") },
-                onValueChange = viewModel::onPromptChange,
-                trailingIcon = {
-                    IconButton(
-                        onClick = {
-                            if (viewModel.prompt.isNotBlank()) {
-                                viewModel.send()
+
+    ModalNavigationDrawer(
+        drawerContent = {
+            ModalDrawerSheet {
+                Scaffold(
+                    topBar = {
+                        CenterAlignedTopAppBar(
+                            title = { Text("Saved Chats") },
+                            actions = {
+                                IconButton(onClick = viewModel::saveMessageHistory) {
+                                    Icon(Icons.Default.SaveAlt, null)
+                                }
                             }
-                        },
-                    ) { Icon(Icons.AutoMirrored.Filled.Send, null) }
-                },
-                modifier = Modifier
-                    .focusRequester(focusRequester)
-                    .fillMaxWidth()
-                    .background(BottomAppBarDefaults.containerColor)
-                    .navigationBarsPadding()
-            )
-        },
-        modifier = Modifier
-            .nestedScroll(scrollBehavior.nestedScrollConnection)
-            .imePadding()
-    ) { padding ->
-        LazyColumn(
-            state = lazyState,
-            verticalArrangement = Arrangement.spacedBy(2.dp),
-            contentPadding = padding,
-            modifier = Modifier
-                .fillMaxSize() // fill the entire window
-                //.imePadding() // padding for the bottom for the IME
-                .imeNestedScroll(), // scroll IME at the bottom
-        ) {
-            items(viewModel.messageList) { message ->
-                when (message) {
-                    is Message.Error -> ErrorMessage(
-                        message = message,
-                    )
-
-                    is Message.Gemini -> GeminiMessage(
-                        message = message,
-                    )
-
-                    is Message.User -> UserMessage(
-                        message = message,
-                    )
+                        )
+                    }
+                ) { padding ->
+                    val chatHistory by viewModel.chatHistoryDb.getHistory().collectAsState(initial = emptyList())
+                    LazyColumn(
+                        contentPadding = padding,
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(chatHistory) { history ->
+                            HistoryItem(
+                                history = history,
+                                onClick = { viewModel.loadChatHistory(history) }
+                            )
+                        }
+                    }
                 }
             }
+        }
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("Chat") },
+                    navigationIcon = {
+                        IconButton(onClick = onBackClick) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = viewModel::newChat) {
+                            Icon(Icons.Default.AddCircleOutline, null)
+                        }
+                    },
+                    scrollBehavior = scrollBehavior
+                )
+            },
+            bottomBar = {
+                OutlinedTextField(
+                    value = viewModel.prompt,
+                    label = { Text("Chat with Gemini") },
+                    placeholder = { Text("Enter Text") },
+                    onValueChange = viewModel::onPromptChange,
+                    trailingIcon = {
+                        IconButton(
+                            onClick = {
+                                if (viewModel.prompt.isNotBlank()) {
+                                    viewModel.send()
+                                }
+                            },
+                        ) { Icon(Icons.AutoMirrored.Filled.Send, null) }
+                    },
+                    modifier = Modifier
+                        .focusRequester(focusRequester)
+                        .fillMaxWidth()
+                        .background(BottomAppBarDefaults.containerColor)
+                        .navigationBarsPadding()
+                )
+            },
+            modifier = Modifier
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .imePadding()
+        ) { padding ->
+            LazyColumn(
+                state = lazyState,
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+                contentPadding = padding,
+                modifier = Modifier
+                    .fillMaxSize() // fill the entire window
+                    //.imePadding() // padding for the bottom for the IME
+                    .imeNestedScroll(), // scroll IME at the bottom
+            ) {
+                item { GeminiMessage(message = Message.Gemini("Hello! I am Gemini!")) }
 
-            if (viewModel.isLoading) {
-                item {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        CircularProgressIndicator()
+                items(viewModel.messageList) { message ->
+                    when (message) {
+                        is Message.Error -> ErrorMessage(
+                            message = message,
+                        )
+
+                        is Message.Gemini -> GeminiMessage(
+                            message = message,
+                        )
+
+                        is Message.User -> UserMessage(
+                            message = message,
+                        )
+                    }
+                }
+
+                if (viewModel.isLoading) {
+                    item {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            CircularProgressIndicator()
+                        }
                     }
                 }
             }
@@ -216,6 +266,20 @@ private fun ErrorMessage(
                 modifier = Modifier.padding(horizontal = 8.dp)
             )
         }
+    }
+}
+
+@Composable
+private fun HistoryItem(
+    history: History,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    OutlinedCard(
+        onClick = onClick,
+        modifier = modifier
+    ) {
+        ListItem(headlineContent = { Text(history.messageList.firstOrNull()?.message.orEmpty()) })
     }
 }
 

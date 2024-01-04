@@ -8,6 +8,7 @@ junit = "4.14-SNAPSHOT"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
 landscapistGlide = "2.2.13"
+realm = "1.11.0"
 lifecycleRuntimeKtx = "2.6.2"
 lifecycleViewmodelCompose = "2.6.2"
 activityCompose = "1.8.2"
@@ -38,6 +39,7 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 landscapist-glide = { module = "com.github.skydoves:landscapist-glide", version.ref = "landscapistGlide" }
+realm = { module = "io.realm.kotlin:library-base", version.ref = "realm" }
 navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation-compose-version" }
 generativeai = { group = "com.google.ai.client.generativeai", name = "generativeai", version.ref = "generativeai" }
 
@@ -45,4 +47,4 @@ generativeai = { group = "com.google.ai.client.generativeai", name = "generative
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 googleAndroidLibrariesMapsplatformSecretsGradlePlugin = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "googleAndroidLibrariesMapsplatformSecretsGradlePlugin" }
-
+realmPlugin = { id = "io.realm.kotlin", version.ref = "realm" }
