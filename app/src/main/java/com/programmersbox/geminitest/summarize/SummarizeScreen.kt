@@ -94,7 +94,6 @@ fun SummarizeScreen(
                                 onSummarizeClicked(prompt)
                             }
                         },
-                        modifier = Modifier
                     ) {
                         Text(stringResource(R.string.action_go))
                     }
